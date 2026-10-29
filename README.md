@@ -1,6 +1,6 @@
 # 100 days of Inference Engineering
 
-### day 1
+### Day 1
 
 - today i read chapter 0 of Inference Engineering. some of the learnings below:
 
