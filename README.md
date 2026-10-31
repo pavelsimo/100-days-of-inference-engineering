@@ -41,3 +41,42 @@
 - learned a bunch of metrics: time to first token (TTFT), perceived and total tokens per second (TPS), iter-token latency (ITL), also the important of consider latency percentiles while measuring those.
 
     ![LLM Performance Metrics](images/llm-performance-metrics.png)
+
+
+### Day 3
+
+- today i read chapter 2 of Inference Engineering. there's a lot to cover, so i'm splitting this chapter into two posts. one today and one tomorrow. that way i can keep the post in a "manageable" size without leaving too much content out.
+
+- the chapter starts with a high-level intro to neural networks in section 2.1. some of it was familiar, but still a good refresher... section 2.2 then builds on that with the basics of inference, attention, and MoE. 
+
+- my notes below:
+
+- transfomers have become the foundation of generative AI. as you might know there are not exclusive to LLMs, they power every modality: voice, image, video, etc. 
+
+- two important transformer-based models: autoregressive token generation and iterative denoising.
+
+- neural networks have nodes (neurons). a group of nodes is called a layer. there are three types of layers: input layer, hidden layer, and output layer.
+
+- the book explains matmul is a core operation for linear layers, and why stacking linear layers alone collapses into a single layer with all matrices combined together.
+
+- activations like ReLU add nonlinearity so the network can learn more complex patterns. basically break linearity to allow for multi-layer neural networks.
+
+- as you probably heard by now, LLMs typically produce tokens autoregressively. this means they produce new tokens one at a time based on every previous token.
+
+    ![Neural Network Basics](images/neural_network_basics.png)
+
+- the book explained the two phases of inference: prefill and decode. in prefill we process the prompt and cache its keys and values. decode then uses that cache to generate tokens one at a time.
+
+- the inference process can be nudged by configuration arguments such as: temperature, top-k and top-p. if you would like to learn more, in my CUDA series we implemented kernels for top-k and top-p sampling. 
+
+- there are two main types of attention: self-attention and cross-attention. self-attention is when tokens pay attention to other tokens in the same sequence (that's what happens in LLMs). cross-attention is when one sequence pays attention to another, like image features looking at a text prompt while generating an image.
+
+    ![Attention](images/attention.png)
+
+- the book also explains mixture of experts (MoE) architecture optimization. the idea is that inside the neural network, some layers have several smaller networks called "experts". when generating an answer a router picks just a few of those experts to process each token. that way, the model can have more parameters without using all of them for every token, which saves computation. 
+
+- you may have seen this in some qwen model names, for example: Qwen3-235B-A22B. here A22B means 22B active parameters per token, out of 235B total parameters.
+
+    ![LLM Inference Mechanics](images/llm_inference_mechanics.png)
+
+    ![LLM Architecture](images/llm_architecture.png)
