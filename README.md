@@ -67,7 +67,7 @@
 
 - the book explained the two phases of inference: prefill and decode. in prefill we process the prompt and cache its keys and values. decode then uses that cache to generate tokens one at a time.
 
-- the inference process can be nudged by configuration arguments such as: temperature, top-k and top-p. if you would like to learn more, in my CUDA series we implemented kernels for top-k and top-p sampling. 
+- the inference process can be nudged by configuration arguments such as: temperature, top-k and top-p.
 
 - there are two main types of attention: self-attention and cross-attention. self-attention is when tokens pay attention to other tokens in the same sequence (that's what happens in LLMs). cross-attention is when one sequence pays attention to another, like image features looking at a text prompt while generating an image.
 
