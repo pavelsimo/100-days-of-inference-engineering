@@ -103,8 +103,6 @@
 
     ![Image Generation Arguments](images/image-generation-args.png)
 
-- the mentioned stable diffusion xl (SDXL) as an example. it came out in 2023, but newer models like qwen image still follow a similar pipeline.
-
 - video generation works in a similar way, but with a sequence of frames instead of a single image.
 
 - many video diffusion models process a whole clip in latent space, so longer clips need more memory and compute. that's one reason many video generation tools only let you generate short clips at a time.
