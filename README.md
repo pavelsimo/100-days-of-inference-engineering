@@ -78,3 +78,47 @@
     ![LLM Inference Mechanics](images/llm_inference_mechanics.png)
 
     ![LLM Architecture](images/llm_architecture.png)
+
+### Day 4
+
+- yesterday we read chapter 2 but we couldn't fit everything into the Day 3 post, so here are the missing notes.
+
+- text-to-image models take a text prompt and create an image from it.
+
+- these models usually work as pipelines made up of multiple models.
+
+- those pipelines typically have three essential components.
+
+- the first is a text encoder, which turn the prompt into an internal representation the model can understand.
+
+- the second is the denoising model, which is kind of the meat of the whole process, because it starts with random noise in latent space and gradually refines it based on the input prompt.
+
+- the third is the variational autoencoder (VAE), whose decoder converts the result from latent space back into pixel space.
+
+- if you're wondering what latent space is, think of it as a compressed representation of the data, in this case the image. images usually have a lot of pixels... which can add extra computation, so using latent space helps avoid that overhead.
+
+- most of the time in this pipeline goes into denoising. few-step models can reduce the number of steps to generate images faster, but at the cost of losing some output quality. 
+
+- image generation is usually controlled with several parameters, such as prompt, negative prompt, number of steps, guidance scale, and image size.
+
+    ![Image Generation Arguments](images/image-generation-args.png)
+
+- the mentioned stable diffusion xl (SDXL) as an example. it came out in 2023, but newer models like qwen image still follow a similar pipeline.
+
+- video generation works in a similar way, but with a sequence of frames instead of a single image.
+
+- many video diffusion models process a whole clip in latent space, so longer clips need more memory and compute. that's one reason many video generation tools only let you generate short clips at a time.
+
+    ![Image Generation](images/image-generation.png)
+
+- metrics like ops:byte ratio and arithmetic intensity, together with the roofline model, are really helpful to figure out whether our program is memory bound or compute bound.
+
+    ![Ops:Byte Ratio and Arithmetic Intensity](images/ops_byte_arithmetic_intensity.png)
+
+    ![GPU Bottlenecks](images/gpu_bottlenecks.png)
+
+- "normal" attention has quadratic compute cost during prefill, which can make long prompts expensive to process...
+
+- there are two main ways to speed attention. first, improve the implementation without changing the attention computation, like flash attention and paged attention, or change the algorithm to scale better at a possible cost to quality... like sliding window attention, linear attention or replacing attention with state-space models like mamba.
+
+    ![Optimizing Attention](images/optimizing_attention.png)
