@@ -125,43 +125,43 @@
 
 - today i read chapter 3 of Inference Engineering. this chapter is all about hardware! 
 
-- three types of GPUs in the market. data center GPUs (B200), workstation GPUs (NVIDIA RTX Pro 6000), personal computing GPUs (NVIDIA GeForce RTX 5090).
+- three types of gpus in the market. data center gpus (B200), workstation gpus (NVIDIA RTX Pro 6000), personal computing gpus (NVIDIA GeForce RTX 5090).
 
-- it is not hard to guess that data center GPUs offer the highest performance, but they really shine when it comes to high-bandwidth gpu-to-gpu interconnection.
+- it is not hard to guess that data center gpus offer the highest performance, but they really shine when it comes to high-bandwidth gpu-to-gpu interconnection.
 
     ![GPUs for Inference](images/gpus_for_inference.png)
 
-- the book showcases the main differences between CPUs and GPUs. basically GPUs are optimized for throughput, while CPUs for latency.
+- the book showcases the main differences between cpus and gpus. basically gpus are optimized for throughput, while cpus for latency.
 
-- in GPUs the term "core" have a different meaning than in CPUs. here could be either: cuda cores (scalars), tensor cores (matrices), SFUs (sin, cos, log).
+- in gpus the term "core" have a different meaning than in cpus. here could be either: cuda cores (scalars), tensor cores (matrices), sfus (sin, cos, log).
 
-- as an inference engineer, it helps to have a strong mental model of what is going on in the GPU.
+- as an inference engineer, it helps to have a strong mental model of what is going on in the gpu.
 
-- compute is measured in FLOPS (floating point operations per second). spec sheet often mentioned two measurements for tensor core compute: dense and sparse.
+- compute is measured in flops (floating point operations per second). spec sheet often mentioned two measurements for tensor core compute: dense and sparse.
 
 - dense is the raw floating-point ops/sec.
 
 - sparse is for tensors where half of the values are 0, and tensor cores can skip multiplication by 0.
 
-- compute is the bottleneck for LLM prefill and for image/video generation. if you are selecting hardware, keep that in mind. memory bandwidth is the bottleneck for LLM decode, so if you pick a GPU and want to generate more tok/sec, select the one with higher memory bandwidth.
+- compute is the bottleneck for llm prefill and for image/video generation. if you are selecting hardware, keep that in mind. memory bandwidth is the bottleneck for llm decode, so if you pick a gpu and want to generate more tok/sec, select the one with higher memory bandwidth.
 
-- the "V" in VRAM stands for "video", and that is related to the original usage of GPUs.
+- the "v" in vram stands for "video", and that is related to the original usage of gpus.
 
-- VRAM for datacenter gpus usually comes in the form of HBM3, HBM3e or HBM4.
+- vram for datacenter gpus usually comes in the form of hbm3, hbm3e or hbm4.
 
-- in GPUs, we can also find static ram (SRAM), which is an on-chip memory usually in the KB to MB range.
+- in gpus, we can also find static ram (sram), which is an on-chip memory usually in the kb to mb range.
 
     ![Inside a GPU](images/inside_a_gpu.png)
 
-- if you compare it with software, hardware interactions are slow. shipping GPUs involves building something in the "real" world.
+- if you compare it with software, hardware interactions are slow. shipping gpus involves building something in the "real" world.
 
 - gpu names have two parts <letter><number>, for example B200, H100, etc. the letter is the architecture generation, and those are usually inspired by scientist names, for example blackwell is named after mathematician david blackwell. the number is used to identify the particular model within the generation.
 
-- nvidia releases a new GPU architecture every one to two years.
+- nvidia releases a new gpu architecture every one to two years.
 
 - rubin is the next architecture from nvidia, and after that feynman.
 
-- nvidia is also going into CPUs with "grace". the major advantage of grace is a much higher-bandwidth connection between cpu and gpu.
+- nvidia is also going into cpus with "grace". the major advantage of grace is a much higher-bandwidth connection between cpu and gpu.
 
     ![NVIDIA GPU Architectures](images/nvidia_gpu_archs.png)
 
