@@ -155,7 +155,7 @@
 
 - if you compare it with software, hardware interactions are slow. shipping gpus involves building something in the "real" world.
 
-- gpu names have two parts <letter><number>, for example B200, H100, etc. the letter is the architecture generation, and those are usually inspired by scientist names, for example blackwell is named after mathematician david blackwell. the number is used to identify the particular model within the generation.
+- gpu names have two parts `letter - number`, for example B200, H100, etc. the letter is the architecture generation, and those are usually inspired by scientist names, for example blackwell is named after mathematician david blackwell. the number is used to identify the particular model within the generation.
 
 - nvidia releases a new gpu architecture every one to two years.
 
