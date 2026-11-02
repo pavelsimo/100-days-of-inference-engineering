@@ -120,3 +120,71 @@
 - there are two main ways to speed attention. first, improve the implementation without changing the attention computation, like flash attention and paged attention, or change the algorithm to scale better at a possible cost to quality... like sliding window attention, linear attention or replacing attention with state-space models like mamba.
 
     ![Optimizing Attention](images/optimizing_attention.png)
+
+### Day 5
+
+- today i read chapter 3 of Inference Engineering. this chapter is all about hardware! 
+
+- three types of GPUs in the market. data center GPUs (B200), workstation GPUs (NVIDIA RTX Pro 6000), personal computing GPUs (NVIDIA GeForce RTX 5090).
+
+- it is not hard to guess that data center GPUs offer the highest performance, but they really shine when it comes to high-bandwidth gpu-to-gpu interconnection.
+
+    ![GPUs for Inference](images/gpus_for_inference.png)
+
+- the book showcases the main differences between CPUs and GPUs. basically GPUs are optimized for throughput, while CPUs for latency.
+
+- in GPUs the term "core" have a different meaning than in CPUs. here could be either: cuda cores (scalars), tensor cores (matrices), SFUs (sin, cos, log).
+
+- as an inference engineer, it helps to have a strong mental model of what is going on in the GPU.
+
+- compute is measured in FLOPS (floating point operations per second). spec sheet often mentioned two measurements for tensor core compute: dense and sparse.
+
+- dense is the raw floating-point ops/sec.
+
+- sparse is for tensors where half of the values are 0, and tensor cores can skip multiplication by 0.
+
+- compute is the bottleneck for LLM prefill and for image/video generation. if you are selecting hardware, keep that in mind. memory bandwidth is the bottleneck for LLM decode, so if you pick a GPU and want to generate more tok/sec, select the one with higher memory bandwidth.
+
+- the "V" in VRAM stands for "video", and that is related to the original usage of GPUs.
+
+- VRAM for datacenter gpus usually comes in the form of HBM3, HBM3e or HBM4.
+
+- in GPUs, we can also find static ram (SRAM), which is an on-chip memory usually in the KB to MB range.
+
+    ![Inside a GPU](images/inside_a_gpu.png)
+
+- if you compare it with software, hardware interactions are slow. shipping GPUs involves building something in the "real" world.
+
+- gpu names have two parts <letter><number>, for example B200, H100, etc. the letter is the architecture generation, and those are usually inspired by scientist names, for example blackwell is named after mathematician david blackwell. the number is used to identify the particular model within the generation.
+
+- nvidia releases a new GPU architecture every one to two years.
+
+- rubin is the next architecture from nvidia, and after that feynman.
+
+- nvidia is also going into CPUs with "grace". the major advantage of grace is a much higher-bandwidth connection between cpu and gpu.
+
+    ![NVIDIA GPU Architectures](images/nvidia_gpu_archs.png)
+
+- the atomic unit for gpu allocation in the cloud is the "instance".
+
+- basically, an instance is a fancy word for a "virtual machine" that bundles together gpus, cpus, memory, storage, networking, and interconnect.
+
+- by interconnect, i mean the physical gpu-to-gpu and node-to-node connections that let you run multiple gpus at once.
+
+- usually, models are too big to run on a single gpu, and it is not rare to need between 2-8 (even more) gpus to run a large model like deepseek.
+
+- for those connections, gpus can be connected via two systems: NVLink (one-to-one) or NVSwitch (all-to-all).
+
+- for node-to-node communication, the standard for nvidia gpus is infiniband, which competes with ethernet.
+
+- sometimes you run into the opposite problem, where the gpu is too big for the model. so instead of falling back to older gpus, you can use multi-instance gpu, which helps you split a gpu into multiple slices.
+
+![Cloud GPU instances](images/cloud_gpu_instances.png)
+
+- finally, the book also touches briefly on local inference and its advantages: zero network latency, independence, privacy, and cost.
+
+- some of the disadvantages include hardware capabilities, thermal constraints, fragmented support, and battery life.
+
+![Beyond NVIDIA](images/beyond_nvidia.png)
+
+![Local Inference](images/local_inference.png)
