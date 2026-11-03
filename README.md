@@ -213,7 +213,7 @@
 
 - kernels are hardware specific. a kernel written for an h100 might fail to take advantage of the architecture and extra memory of a b200. in addition, porting handwritten kernels to run optimally on the new architecture might take substantial engineering work.
 
-- if you followed my cuda series, we learned that launching kernels has an overhead, so it is usually better to bundle kernels into bigger ones to avoid paying a high price. this is called kernel fusion (like in dragonball fusionnnn haaaaaa!)
+- if you followed my cuda series, we learned that launching kernels has some overhead, so it is usually better to combine them into a bigger one to reduce that cost. this is called kernel fusion (like in dragon ball... fusionnnn haaaaaa!)
 
 - kernel fusion can be either an automatic or a manual process. compilers can identify straightforward fusion opportunities and automatically create fused kernels.
 
