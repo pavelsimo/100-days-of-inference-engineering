@@ -223,7 +223,7 @@
 
 - pytorch has emerged as the clear leader at this level of the stack. though there is also tensorflow and jax.
 
-![Deep Learning Frameworks](images/deep_learning_frameworks.png)
+    ![Deep Learning Frameworks](images/deep_learning_frameworks.png)
 
 - pytorch lets you work with tensors in python and autograd takes care of calculating gradients for you... (convinient, right?).
 
@@ -233,7 +233,7 @@
 
 - onnx includes both the model weights and the execution graph, which describes how the operations connect.
 
-![Model File Formats](images/model_file_formats.png)
+    ![Model File Formats](images/model_file_formats.png)
 
 - finally, you can run pytorch models with onnx runtime by exporting them to onnx, or with tensorrt by compiling them with torch-tensorrt. both runtimes are built for fast inference.
 
