@@ -188,3 +188,55 @@
 ![Beyond NVIDIA](images/beyond_nvidia.png)
 
 ![Local Inference](images/local_inference.png)
+
+### Day 6
+
+- today i read chapter 4 of Inference Engineering. this chapter is about software, and is a bit too long... i'm splitting it up. here is the first half:
+
+- nvidia is basically the king of the jungle in the inference space.
+
+- some of the key players in the space are nvidia (CUDA, Dynamo), hugging face (transformers, diffusers), the linux foundation (PyTorch, vLLM), and lmsys org (SGLang).
+
+    ![Inference Software Stack](images/the_inference_software_stack.png)
+
+- cuda is nvidia propietary computing platform for executing parallel tasks on gpus. 
+
+- as a developer you don't need to write kernels from scratch all the time.
+
+- nvidia provides different primitive libraries for various purposes: cudnn (deep neural network) and cublas (linear algebra).
+
+- there are also libraries like cute and cutlass, which help you write kernels at a higher level of abstraction while maintaining really strong performance.
+
+- another source of kernels is flashinfer, is a library of high-perf. kernel implementations for inference.
+
+- according to the book, most inference engineers will never need to write kernels. instead, kernel selection, like choosing a plugin from pre-existing kernels, is a key part of the optimization process.
+
+- kernels are hardware specific. a kernel written for an h100 might fail to take advantage of the architecture and extra memory of a b200. in addition, porting handwritten kernels to run optimally on the new architecture might take substantial engineering work.
+
+- if you followed my cuda series, we learned that launching kernels has an overhead, so it is usually better to bundle kernels into bigger ones to avoid paying a high price. this is called kernel fusion (like in dragonball fusionnnn haaaaaa!)
+
+- kernel fusion can be either an automatic or a manual process. compilers can identify straightforward fusion opportunities and automatically create fused kernels.
+
+- but... more sophisticated algorithms like flash attention require a handwritten fused kernels. 
+
+- and for those of us who would rather not debug cuda kernels... there are many deep learning frameworks and libraries that make our life easier.  
+
+- pytorch has emerged as the clear leader at this level of the stack. though there is also tensorflow and jax.
+
+![Deep Learning Frameworks](images/deep_learning_frameworks.png)
+
+- pytorch lets you work with tensors in python and autograd takes care of calculating gradients for you... (convinient, right?).
+
+- pytorch is useful for inference as well. `torch.compile` can speed things up by selecting kernels for your gpu and fusing operations together.
+
+- safetensors saves model weights without executable python code. 
+
+- onnx includes both the model weights and the execution graph, which describes how the operations connect.
+
+![Model File Formats](images/model_file_formats.png)
+
+- finally, you can run pytorch models with onnx runtime by exporting them to onnx, or with tensorrt by compiling them with torch-tensorrt. both runtimes are built for fast inference.
+
+- onnx runtime is open source and works across different gpu types. tensorrt only supports nvidia gpus, but works particularly well for image and video workloads.
+
+    ![From Pytorch to a Runtime](images/from_pytorch_to_a_runtime.png)
