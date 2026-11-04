@@ -240,3 +240,45 @@
 - onnx runtime is open source and works across different gpu types. tensorrt only supports nvidia gpus, but works particularly well for image and video workloads.
 
     ![From Pytorch to a Runtime](images/from_pytorch_to_a_runtime.png)
+
+### Day 7
+
+- picking up where i left off yesterday... here are the rest of my notes on chapter 4 of Inference Engineering:
+
+- the book covers three main inference engines: vllm, sglang and tensorrt-llm. which one you pick depends on the model you're running, your hardware and the performance you need.
+
+- vllm is a good place to start since it supports lots of models and hardware. there's also vllm omni for image, audio and video inputs and outputs.
+
+- sglang is another option, especially for large MoE models like deepseek and kimi, which it has optimized implementations for. it also has sglang diffusion for image and video generation.
+
+    ![Inference Engines](images/inference-engines.png)
+
+- if you're using nvidia gpus, tensorrt-llm is another option. its kernels are tuned for nvidia hardware and it integrates really well with nvidia dynamo.
+
+- hmm so what is this dynamo thing? nvidia first announced dynamo at gtc in march 2025. it's a distributed system for serving models across multiple machines. 
+
+- dnyamo in a way feels like kubernetes for llm inference, coordinates gpus across multiple machines, routes request, etc.
+
+- dynamo can use any of the three engines mentioned above as a backend: vllm, sglang or tensorrt-llm.
+
+- if you're building an inference api for a foundation model you built from scratch, or serving an open model in a product with lots of traffic, dynamo might be a good option.
+
+- according to the book, for smaller deployments is better to use the inference engines directly (vanilla vllm, ...). dynamo adds complexity and overhead.
+
+    ![NVIDIA Dynamo](images/nvidia-dynamo.png)
+
+- finally, the last section of chapter 4 focus on benchmarking and profiling.
+
+- to put it in simple terms, benchmarking tells you how "well" your system is perfoming. while profiling tells you why is performing that way.
+
+- benchmarking looks at the bigger picture, metrics like TTFT. profiling is more granular in nature, like how much time a softmax kernel takes to run.
+
+- for benchmarking, you can use tools like sglang genai-bench, nvidia genai-perf, locust. also there are open-source eval datasets such as mmlu, gsm8k, swe-bench, and humaneval to get a realistic performance read.
+
+- for profiling, tools like pytorch profiler, nvidia nsight systems (nsys), nvidia nsight compute (ncu), tensorflow, and tensorrt built-in profilers help you see where time and memory are actually going.
+
+- the book also explained the importance of shadowing to get high-quality benchmark results.
+
+- with shadowing, you send a copy of real production requests to your test system. that way you can benchmarking without affecting your original request.
+
+    ![Benchmarking and Profiling](images/benchmarking-and-profiling.png)
