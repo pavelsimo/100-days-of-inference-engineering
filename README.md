@@ -293,13 +293,13 @@
 
 - quantization is the process of reducing numerical precision (less bits) of model weights and activations with the goal of lowering memory usage and improve inference speed. 
 
-- quantization improves inference for both prefill and decode. prefill can run lower precision tensor cors with twice the flops. and decode only needs to load half as much data, doubling the memory bandwidth.
+- quantization improves inference for both prefill and decode. prefill can run lower precision tensor cores with twice the flops. and decode only needs to load half as much data, doubling the memory bandwidth.
 
     ![Quantization](images/quantization.png)
 
 - the book explains that working with quantized data have some overhead, so is not exactly twice as "good", it is usually 30% to 50% better performance for llms.
 
-- one important concept to understand quantization is "scale factor". you can think of it as a multiplier used during quantization to fit large or small numbers into a lower-precision format, such as fp8 or fp4.
+- one important concept to understand quantization is the "scale factor". you can think of it as a multiplier used during quantization to fit large or small numbers into a lower-precision format, such as fp8 or fp4.
 
     ![Number Formats](images/number-formats.png)
 
