@@ -282,3 +282,50 @@
 - with shadowing, you send a copy of real production requests to your test system. that way you can benchmarking without affecting your original request.
 
     ![Benchmarking and Profiling](images/benchmarking-and-profiling.png)
+
+### Day 8
+
+- today i read chapter 5 of Inference Engineering. this chapter is extremely important, it introduces several optimizations: quantization, speculative decoding, caching, model parallelism and disaggregation. 
+
+    ![Model Performance Techniques](images/model-performance-techniques.png)
+
+- i'll work on one optimization a day so i can cover as much content as possible. so... let's start with quantization:
+
+- quantization is the process of reducing numerical precision (less bits) of model weights and activations with the goal of lowering memory usage and improve inference speed. 
+
+- quantization improves inference for both prefill and decode. prefill can run lower precision tensor cors with twice the flops. and decode only needs to load half as much data, doubling the memory bandwidth.
+
+    ![Quantization](images/quantization.png)
+
+- the book explains that working with quantized data have some overhead, so is not exactly twice as "good", it is usually 30% to 50% better performance for llms.
+
+- one important concept to understand quantization is "scale factor". you can think of it as a multiplier used during quantization to fit large or small numbers into a lower-precision format, such as fp8 or fp4.
+
+    ![Number Formats](images/number-formats.png)
+
+- for example, to store 12 in a format that whose max. value is 6, you can use a scale factor of 2. then keep that scale factor around so you can bring the value back later...
+
+    ```text
+    store:        12 / 2 = 6
+    reconstruct:   6 × 2 = 12
+    ```
+
+- also important is the concept of dynamic range. which is basically how wide the number format's range is. a wider dynamic range means the format can handle both really tiny and really large numbers just fine!
+
+- this is extremely important for quantization because a limited dynamic range can make precision errors more "noticeable".
+
+- a popular tool for post-training quantization is nvidia tensorrt model optimizer (modelopt). its outputs work with all the major inference engines (vllm, sglang, tensorrt-llm).
+
+- gguf is the most popular binary format on hugging face for sharing highly quantized models.
+
+- the book also mentions mxfp8, mxfp4 and nvfp4, which help with dynamic range.
+
+- the book recommends fp8 and mxfp8 as a nice balance between performance and quality. it also mentions fp4, especially nvfp4 as promising...
+
+- for most inference work, you're not quantizing from scratch... you're usually quantizing a model that's already trained. the main choices are which parts to compress and which number format to use.
+
+- finally, after quantizing, you want the quality loss to feel basically zero... so you compare the quantized model against the original.
+
+- there are three techniques for doing this check: perplexity score, intelligence benchmarks, or custom evals that match how you actually use the model.
+
+    ![Quality Impact](images/quantization-measuring-quality-impact.png)
