@@ -336,6 +336,8 @@
 
 - as we saw before, the decode phase generate tokens one at a time, and the main bottleneck is memory bandwidth.
 
+- since decode is memory-bound, some gpu compute sits idle, so we can take advantage of that spare capacity to speculate :)
+
 - the idea behind speculative decoding is to use a smaller, faster model to guess a few tokens ahead. then our target model (bigger model), validates those guesses. checking guesses is much cheaper than generating new ones, like checking a sudoku solution instead of solving it.
 
 - so the small model we use to generate token guesses is called the "draft model", or with a bit more "affection", the speculator... :)
@@ -369,7 +371,7 @@
 
 - medusa: extra heads added to the target model itself, instead of one decoding head we have multiples. important medusa is not widely use in production.
 
-- eagle: a draft model trained to take hidden states as input and generate speculative tokens as output. eagle is the most common speculation method for general llm serving. it gets a high acceptance rate from a tiny model: less than 1b params.
+- eagle: a draft model trained to take hidden states as input and generate speculative tokens as output. eagle is a really popular speculation method for general llm serving. it gets a high acceptance rate from a tiny model: less than 1b params.
 
 - n-gram: instead of using any model at all, is basically a loopup table built from text the model has already seen. 
 
