@@ -329,3 +329,49 @@
 - there are three techniques for doing this check: perplexity score, intelligence benchmarks, or custom evals that match how you actually use the model.
 
     ![Quality Impact](images/quantization-measuring-quality-impact.png)
+
+### Day 9
+
+- still on chapter 5 of inference engineering... today we continue with the second optimization, speculative decoding:
+
+- as we saw before, the decode phase generate tokens one at a time, and the main bottleneck is memory bandwidth.
+
+- the idea behind speculative decoding is to use a smaller, faster model to guess a few tokens ahead. then our target model (bigger model), validates those guesses. checking guesses is much cheaper than generating new ones, like checking a sudoku solution instead of solving it.
+
+- so the small model we use to generate token guesses is called the "draft model", or with a bit more "affection", the speculator... :)
+
+- ok... say our target model output so far is "the gpu". the draft model outputs guesses "[executes] [cuda] [kernels] [quickly]".
+
+- now the target model, checks the guesses. since we already have all the draft tokens, it can check all four in one forward pass:
+
+    ```text
+    the gpu [executes]                      - accepted
+    the gpu executes [cuda]                 - accepted
+    the gpu executes cuda [kernels]         - accepted
+    the gpu executes cuda kernels [quickly] - rejected
+    ```
+
+- now say the target model picks "efficiently" instead of "quickly". we keep the first three guesses and replace the last one: "the gpu executes cuda kernels efficiently".
+
+- so we got four new tokens in one pass of the target model! we still have to pay the price of running the draft model, which is why for this to help the draft model needs to be fast!
+
+    ![Speculative Decoding](images/speculative_decoding.png)
+
+- speculative decoding usually improves tokens per second (TPS) and average inter-token latency (ITL). but no time to first token (TTFT).
+
+- also the performance of speculative decoding depends on the metrics: draft token cost, draft sequence length and token acceptance rate.
+
+- the book explains that one of the most important decisions is which draft model to use. a good draft model has a high token acceptance rate and is not "expensive" to run.
+
+- a few guidelines when picking a draft model: stay in the same model family, keep the draft model at least 10x smaller by param. count, and use fine-tuning or distillation to help it behave more like the target model.
+
+- what we just talked about is "draft-target speculative decoding". the book also explains three other variants: medusa, eagle and n-gram.
+
+- medusa: extra heads added to the target model itself, instead of one decoding head we have multiples. important medusa is not widely use in production.
+
+- eagle: a draft model trained to take hidden states as input and generate speculative tokens as output. eagle is the most common speculation method for general llm serving. it gets a high acceptance rate from a tiny model: less than 1b params.
+
+- n-gram: instead of using any model at all, is basically a loopup table built from text the model has already seen. 
+
+    
+    ![Drafting Tokens](images/four-ways-to-draft-tokens.png)
