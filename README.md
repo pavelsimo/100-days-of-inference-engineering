@@ -353,7 +353,9 @@
     the gpu executes cuda kernels [quickly] - rejected
     ```
 
-- now say the target model picks "efficiently" instead of "quickly". we keep the first three guesses and replace the last one: "the gpu executes cuda kernels efficiently".
+- now say the target model picks "efficiently" instead of "quickly". we keep the first three guesses and replace the last one: 
+
+"the gpu executes cuda kernels efficiently".
 
 - so we got four new tokens in one pass of the target model! we still have to pay the price of running the draft model, which is why for this to help the draft model needs to be fast!
 
