@@ -363,7 +363,7 @@
 
 - speculative decoding usually improves tokens per second (TPS) and average inter-token latency (ITL). but no time to first token (TTFT).
 
-- also the performance of speculative decoding depends on the metrics: draft token cost, draft sequence length and token acceptance rate.
+- also the performance of speculative decoding depends on metrics such as: draft token cost, draft sequence length and token acceptance rate.
 
 - the book explains that one of the most important decisions is which draft model to use. a good draft model has a high token acceptance rate and is not "expensive" to run.
 
@@ -371,11 +371,11 @@
 
 - what we just talked about is "draft-target speculative decoding". the book also explains three other variants: medusa, eagle and n-gram.
 
-- medusa: extra heads added to the target model itself, instead of one decoding head we have multiples. important medusa is not widely use in production.
+- medusa: extra heads added to the target model itself, instead of one decoding head we have multiples. this method is not widely use in production.
 
 - eagle: a draft model trained to take hidden states as input and generate speculative tokens as output. eagle is a really popular speculation method for general llm serving. it gets a high acceptance rate from a tiny model: less than 1b params.
 
-- n-gram: instead of using any model at all, is basically a loopup table built from text the model has already seen. 
+- n-gram: instead of using any model at all, is basically a lookup table built from text the model has already seen. 
 
     
     ![Drafting Tokens](images/four-ways-to-draft-tokens.png)
