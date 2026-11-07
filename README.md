@@ -326,7 +326,7 @@
 
 - finally, after quantizing, you want the quality loss to feel basically zero... so you compare the quantized model against the original.
 
-- there are three techniques for doing this check: perplexity score, intelligence benchmarks, or custom evals that match how you actually use the model.
+- there are three twechniques for doing this check: perplexity score, intelligence benchmarks, or custom evals that match how you actually use the model.
 
     ![Quality Impact](images/quantization-measuring-quality-impact.png)
 
@@ -381,3 +381,48 @@
 
     
     ![Drafting Tokens](images/four-ways-to-draft-tokens.png)
+
+
+### Day 10
+
+- still on chapter 5 of inference engineering... today we continue with the third optimization, caching:
+
+- so... prefill is the phase of llm inference where the model "processes" the input tokens and creates some useful "state" that gets used later in the decoding phase.
+
+- for most inference engines, that useful "state" is the kv-cache. without a kv cache, every new token would force the model to recompute all the prior tokens, which would make inference painfully slow.
+
+- every inference engine already uses kv-caching by default, but usually on a request-by-request basis. we can get even more "caching" by sharing that state between requests, instead of treating each input sequence in isolation...
+
+    ![KV-Cache Reuse](images/kv-cache-reuse.png)
+
+- the book talks about prefix caching, which is basically a way to skip prefill when requests start with the same tokens, by reusing an existing kv-cache from previous requests.
+
+- as the name indicates prefix-caching works only from the start of the input sequence to the first non-repeated token.
+
+- prefix caching really shines in the following cases: long system prompts, code completion, document retrieval, and multi-turn chats.
+
+- so... to get the most out of prefix caching you need to put the static context first and dynamic context later.
+
+- probably by now you must be wondering... hmm why not "substring caching"? i mean, let's be honest, prefixes only just makes everything harder, right? 
+
+- the book mentions there is research like cacheblend, and lmcache is working on reusing non-prefix chunks too, but that needs extra corrections to stay accurate.
+
+- so is clear that kv-caches are super valuable, but here is the bad news the eat a ton of memory... which is why inference engineers need to manage gpu vram carefully.
+
+- part of the job is to tune how much memory the engine allocates to the kv cache. 
+
+- once the cache fills up, old entries get evicted, which increases cache misses on later requests, ups...
+
+- the book explains for getting more capacity, you can offload kv blocks to cpu ram, local ssds, or networked storage. g1 gpu memory is fastest but small, while g2, g3, and g4 storage offer bigger capacity with lower bandwidth.
+
+- basically... the further you move away from the gpu chip, the slower your memory bandwidth becomes, but your storage capacity gets bigger. tradeoffs, tradeoffs... 
+
+- in production, it helps to send requests from the same user or with the same context to the same replica when possible, so it can reuse what's already cached. replicas can also share cached sequences through a global kv cache over the network.
+
+    ![Cache Aware Routing](images/cache-aware-routing.png)
+
+- finally, long context has a cost too... once you're dealing with 32k, 64k, or 128k tokens, the kv cache can eat up a lot of memory and slow down inference.
+
+- for this flash attention, paged attention and chunked prefill help to make those longer contexts more manageable.
+
+    ![Long Context](images/kv-cache-long-context.png)
