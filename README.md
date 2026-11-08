@@ -443,9 +443,9 @@
 
 - in chapter 3 we saw that gpus use nvlink and nvswitch inside a node, and infiniband between nodes. those interconnects are "fast", but they're still much slower than the memory bandwidth inside a gpu.
 
-- because of this, we need to design parallelism carefully around the hardware layout. til there is a field that studies this inter-gpu communication called "topology-aware parallelism".
+- because of this, we need to design parallelism carefully around the hardware layout...
 
-- that still leaves us with a question... how do we actually split the model across gpus? the book covers three main options: pipeline parallelism (pp), tensor parallelism (tp), and expert parallelism (ep).
+- hmm so how do we actually split the model across gpus? the book covers three main options: pipeline parallelism (pp), tensor parallelism (tp), and expert parallelism (ep).
 
 - with pipeline parallelism, we split the layers across gpus. it sounds straightforward, but latency is often poor and the gpus spend too much time waiting around... so it's usually not our first choice.
 
