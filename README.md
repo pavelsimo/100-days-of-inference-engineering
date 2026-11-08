@@ -426,3 +426,35 @@
 - for this flash attention, paged attention and chunked prefill help to make those longer contexts more manageable.
 
     ![Long Context](images/kv-cache-long-context.png)
+
+### Day 11
+
+- still on chapter 5 of inference engineering... today we continue with the fourth optimization, model parallelism:
+
+- frontier llms today are usually too big for a single gpu... just to give you a sense, check out the image below for the memory breakdown of deepseek-v3 with 671b params (fp8).
+
+    ![How Many GPUs?](images/how-many-gpus.png)
+
+- that's a big problem because the kv-cache is also quite demanding on memory. for example, once you host the weights, the kv-cache often eats 80% or more of the remaining vram.
+
+- so by now it should be clear that we can't just run our models on one gpu and call it a day... multiple gpus are needed.
+
+- but here's the deal... once we're on more than one gpu, we have to worry about how they talk to each other! 
+
+- in chapter 3 we saw that gpus use nvlink and nvswitch inside a node, and infiniband between nodes. those interconnects are "fast", but they're still much slower than the memory bandwidth inside a gpu.
+
+- because of this, we need to design parallelism carefully around the hardware layout. til there is a field that studies this inter-gpu communication called "topology-aware parallelism".
+
+- that still leaves us with a question... how do we actually split the model across gpus? the book covers three main options: pipeline parallelism (pp), tensor parallelism (tp), and expert parallelism (ep).
+
+- with pipeline parallelism, we split the layers across gpus. it sounds straightforward, but latency is often poor and the gpus spend too much time waiting around... so it's usually not our first choice.
+
+- tensor parallelism splits the tensors inside each layer across gpus. this works really well when we want low latency and all our gpus are in the same node.
+
+- then we have expert parallelism for moe models... here we spread whole experts across gpus, which can help us get more throughput. the gpus also need to talk less than with tensor parallelism, especially since we can keep a copy of the router on each gpu.
+
+- so... if we want low latency on a single node, tensor parallelism is usually our best bet. expert parallelism helps us get more throughput from moe llms, and pipeline parallelism is pretty much only used when we need multiple nodes.
+
+    ![Model Parallelism](images/model-parallelism.png)
+
+    ![Parallelism As Matrices](images/parallelism-as-matrices.png)
