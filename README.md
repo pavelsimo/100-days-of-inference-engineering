@@ -451,10 +451,48 @@
 
 - tensor parallelism splits the tensors inside each layer across gpus. this works really well when we want low latency and all our gpus are in the same node.
 
-- then we have expert parallelism for moe models... here we spread whole experts across gpus, which can help us get more throughput. the gpus also need to talk less than with tensor parallelism, especially since we can keep a copy of the router on each gpu.
+- finally, we have expert parallelism for moe models... here we spread whole experts across gpus, which can help us get more throughput. the gpus also need to talk less than with tensor parallelism, especially since we can keep a copy of the router on each gpu.
 
 - so... if we want low latency on a single node, tensor parallelism is usually our best bet. expert parallelism helps us get more throughput from moe llms, and pipeline parallelism is pretty much only used when we need multiple nodes.
 
     ![Model Parallelism](images/model-parallelism.png)
 
     ![Parallelism As Matrices](images/parallelism-as-matrices.png)
+
+### Day 12
+
+- still on chapter 5 of inference engineering... today we continue with the last optimization from this chapter, disaggregation:
+
+- disaggregation, in the context of inference engineering, means separating prefill and decode on separate gpus.
+
+- when prefill and decode run on the same node under heavy traffic, they can interfere with each other. this could happen with large batches or if the node is using optimizations that take a lot of compute.
+
+- in those cases, disaggregation can reduce that interference by moving prefill and decode apart, as long as there are no "crazy" interconnect bottlenecks, for example nvlink or infiband memory bandwidth limits, etc...
+
+- anyway... the book introduces three types of disaggregation:
+
+- "basic" disaggregation: prefill and decode run on separate nodes. in this type, the prefill engine sends the kv-cache to the decode engine over the hardware interconnect. i called it "basic" to help with the explanation, because the book just calls it "disaggregation," which is a bit unclear imho...
+
+    ![Basic Disaggregation](images/basic-disaggregation.png)
+
+- conditional disaggregation: decode first checks if the request can be handled locally, in the decode engine. otherwise, it sends the request to the prefill engine. this is useful because real traffic is "mixed", not every request needs full disaggregation...
+
+    ![Conditional Disaggregation](images/conditional-disaggregation.png)
+
+- dynamic disaggregation: the number of prefill and decode engines can change at runtime to match traffic. nvidia dynamo provides configurable thresholds to make this type of disaggregation possible.
+
+    ![Dynamic Disaggregation](images/dynamic-disaggregation.png)
+
+- finally, it is important to know when disaggregation makes sense... the book shares three guidelines:
+
+- you're serving a lot of traffic, roughly 100m to 1b tokens per day depending on model size.
+
+- you're serving a large model, at least 100b parameters.
+
+- your traffic is prefill-heavy with long inputs.
+
+- if the first two aren't true, you're probably paying for extra hardware for small gains.
+
+- if the third isn't true, the extra gpus might be better used for more replicas, since decode engines are more efficient for short sequences or prefix cache hits.
+
+    ![When To Disaggregate](images/when-to-disaggregate.png)
