@@ -496,3 +496,44 @@
 - if the third isn't true, the extra gpus might be better used for more replicas, since decode engines are more efficient for short sequences or prefix cache hits.
 
     ![When To Disaggregate](images/when-to-disaggregate.png)
+
+### Day 13
+
+
+- today i started reading chapter 6 of inference engineering. this chapter is about model modalities. i'll cover one subsection per day. we're starting with vision language models.
+
+- the book put it super simply... a model modality describes what types of input it accepts and what types of output it creates.
+
+    ![Model Modalities](images/model-modalities.png)
+
+- vision language models, or vlms, take one or more images or videos along with a text prompt and generate a text response.
+
+- usually the language model part is much larger than the vision encoder... the book show a mistral large example where the language model part is 270x bigger than the vision encoder... note this does not make the vision part less important during inference.
+
+- the book explains that images turn into a lot of visual tokens, and those bigger inputs make the kv-cache bigger.
+
+- as a way to gain some "intuition" about this, a high-resolution image turns into ~1000 tokens. 
+
+- which is why all the optimization techniques from chapter 5 come in handy when hosting vlms. on top of that, vlms can also use downsampling to reduce token usage, especially for multiple images or video inputs.
+
+    ![Vision Language Model](images/vision-language-model.png)
+
+- the book explains that a "video is not the sum of it's frames"... 
+
+- there is audio, and super important the way frames transition between each other communicates "motion", which is lost when you snapshot a single frame...
+
+- and should not be too difficult to imagine, since there are many frames in a video a raw video can create a huge token count! 
+
+- so downsampling frames and resolution is basically "must-have" to fit a clip into one request.
+
+    ![Video in VLM](images/video-in-vlm.png)
+
+- finally, the chapter introduces omni models, which are type of model that can take multiple input types and produce multiple output types.
+
+- omni-models can "blend" multiple modalities, magic... :)
+
+- unfortunately, practically speaking, smaller and more specialized models tend to be faster and more accurate.
+
+- which is why in the "wild" (the real world) it's more common to see specialized pipelines, like pdf parsing, image ocr, audio transcription, etc, instead of one mighty omni-model!
+
+    ![Omni-Models](images/omni-models.png)
