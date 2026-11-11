@@ -499,7 +499,6 @@
 
 ### Day 13
 
-
 - today i started reading chapter 6 of inference engineering. this chapter is about model modalities. i'll cover one subsection per day. we're starting with vision language models.
 
 - the book put it super simply... a model modality describes what types of input it accepts and what types of output it creates.
@@ -537,3 +536,61 @@
 - which is why in the "wild" (the real world) it's more common to see specialized pipelines, like pdf parsing, image ocr, audio transcription, etc, instead of one mighty omni-model!
 
     ![Omni-Models](images/omni-models.png)
+
+
+### Day 14
+
+- today we continue with chapter 6 of inference engineering. section 6.2: embedding models.
+
+- in simple terms, an embedding model converts a "modality" into a vector representation. here "modality" can be image, text, audio, video, etc.
+
+- a vector is just an array of numbers, like [1, 2, 3, 4].
+
+- vectors are an extremely powerful representation, once you transform your data into a vector space you can use "relatively" simple math to do search, recommendations system, etc. 
+
+- embedding model inference workloads usually comes in two "flavors": low latency lookups or high-throughput backfills.
+
+- low latency lookups are usually user-facing queries that need to be "fast" (low latency).
+
+- high-throughput backfills is batch processing of documents, this is usually async, and tend to be "long" running tasks.
+
+    ![Embedding Models](images/embedding-models.png)
+
+
+- most embedding models on hugging face fall into two transformer families: bert-based or llm-based.
+
+- bert-based are encoder only neural networks, usually with <1B params.
+
+- llm-based are modern language models, usually <= 8B params.
+
+- llm-based models tend to be more "capable"... while bert-based models are usually faster (lower latency).
+
+- there are also models which support matryoshka representation.
+
+- those models are trained in a way that lets you shorten their vectors dimensions...
+
+- for example, you could take a 768 number vector and keep only the first 128 numbers.
+
+- the shorter vector can still be used for search, which saves storage and makes comparisons faster.
+
+- the tradeoff is that you may lose some accuracy, but it's a reasonable price to pay for less storage space...
+
+    ![Embedding model choices](images/embedding-model-choices.png)
+
+- text embedding models can run on multiple runtimes: vllm, sglang, infinity or hugging face tei.
+
+- for best performance, the book recommends tensorrt-llm.
+
+- llm-based embedding models benefit from fp8 quantization.
+
+- to test the quantization: we can embed the same inputs with both models (before quan. and after quan.) and compare the vectors using cosine similarity, the goal is to get at least 99% similarity.
+
+- finally, in high-traffic embedding deployments, batching and queueing matter a ton! 
+
+- because these embedding models tend to handle much bigger batches than other models.
+
+- also... a single request can group dozens or hundreds of text inputs together.
+
+- and many requests can run in parallel on one gpu, since even demanding embedding models are still small and fast.
+
+    ![Serving Embedding Models](images/serving-embedding-models.png)
