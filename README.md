@@ -599,21 +599,21 @@
 
 - today we continue with chapter 6 of inference engineering. section 6.3: asr models.
 
-- asr stands for automatic speech reconition.
+- asr stands for automatic speech recognition.
 
 - asr models take audio as input and output text.
 
-- the most popular asr model to the date is openai whisper.
+- the most popular asr model to date is openai whisper.
 
 - whisper comes in many sizes... tiny, base, small, medium, large and "turbo", ok... "turbo"
 
-- whisper large and turbo are usually good enough for most latency budgets.
+- whisper large and turbo are usually good enough for most latency requirements.
 
 - whisper is an encoder-decoder model. 
 
-- the encoder turns audio waveform into a feature representation, using log-mel spectrogram. 
+- the encoder turns an audio waveform into a feature representation, using a log-mel spectrogram. 
 
-- the decoder take those audio features and output tokens.
+- the decoder takes those audio features and outputs tokens.
 
 - hmm, what is that log-mel spectrogram thing? it's an audio spectrogram, ok... so what's a spectrogram? 
 
@@ -621,31 +621,31 @@
 
 - while a spectrogram tells us "when" those frequencies happen and "how strong" they are.
 
-- the books recommend tensorrt-llm since it helps a lot on the decoder side with batching, it has a fast c++ runtime, and nicely optimized cuda kernels.
+- the book recommends tensorrt-llm since it helps a lot on the decoder side with batching, it has a fast c++ runtime, and nicely optimized cuda kernels.
 
     ![Whisper](images/whisper.png)
 
 - realtime transcription is also another important use case, for example voice agents. 
 
-- for realtime we should aim for 200 ms of round trip per audio chunk, this is no arbitrary number, is the average human reaction time. 
+- for realtime we should aim for a 200 ms round trip per audio chunk, this is no arbitrary number, it is the average human reaction time. 
 
-- the book explains some of the big wins when optimizing whisper comes from the insfrastructure orchestration, not just model optimizations.
+- the book explains some of the big wins when optimizing whisper come from the infrastructure orchestration, not just model optimizations.
 
 - for asr streaming is a must-have, this is usually done at the api layer using a websocket connection. 
 
 - streaming transcription uses a voice activity detection (vad) model to watch the incoming stream and cut it into chunks for the asr model.
 
-- vad is extremely important, without the asr model waste resources processing "silence"... basically audio chunks with no speech.
+- vad is extremely important, without it the asr model wastes resources processing "silence"... basically audio chunks with no speech.
 
     ![Whisper Realtime](images/whisper-realtime.png)
 
-- one limitation of whisper model it can only support 30-second chunks, so to handle long files we need a separate pipeline.
+- one limitation of the whisper model is that it can only support 30-second chunks, so to handle long files we need a separate pipeline.
 
 - to measure performance of long file transcription there is a metric: real-time factor (rtf), hmm not the best name...
 
 - so for example, if a typist can transcribe a whole text in 30 mins, that is an rtf of 2x, or if a machine does it in less than 4 seconds, that is an rtf of 1000x.
 
-- the book explains that fast transcription for long files we need a multiple step pipeline, see image below. 
+- the book explains that for fast transcription of long files we need a multiple step pipeline, see the image below. 
 
     ![Whisper Long File Transcribe](images/whisper-transcribe-longfiles.png)
 
@@ -653,8 +653,8 @@
 
 - in simple words "diarization" is figuring out "who is speaking" and "when" in an audio recording.
 
-- diarization models are a different "beast". instead of transfomers, it is a pipeline of old school ml models for segmentation, embedding and clustering.
+- diarization models are a different "beast". instead of transformers, diarization uses a pipeline of old school ml models for segmentation, embedding and clustering.
 
-- even with optimizations diarization usually at least twice as long as transcription.
+- even with optimizations diarization usually takes at least twice as long as transcription.
 
     ![Diarization](images/diarization.png)
