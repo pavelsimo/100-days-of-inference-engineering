@@ -658,3 +658,47 @@
 - even with optimizations diarization usually takes at least twice as long as transcription.
 
     ![Diarization](images/diarization.png)
+
+### Day 16
+
+- today we continue with chapter 6 of inference engineering. section 6.4: tts models.
+
+- tts models takes text as an input and produce audio as an output, specifically speech.
+
+- the book mentions that starting in 2025, open models like orpheus tts started generating speech that sounds surprisingly human.
+
+- modern tts models are basically fine-tuned llms. for example, orpheus is derived from llama 3.2 3b. that's why many llm optimizations work for tts models too.
+
+    ![TTS Models](images/tts-models.png)
+
+- hmmmm so you may be wondering how we can turn an llm into a tts model? a few things need to happen...
+
+- first, we "teach" the llm an audio vocabulary with tens of thousands of audio tokens... basically giving it a way to represent sound.
+
+- then, we train it on pairs of text inputs and audio tokens as outputs.
+
+- lastly, we add an audio decoder to turn those audio tokens into speech we can actually listen to.
+
+- there are different metrics to measure the performance of a tts model: time to first byte (ttfb), time to first sentence and tokens per second (tps).
+
+- note for tts model we don't need "infinity" tps, around 80 to 100 tps is often enough for real-time audio.
+
+- past that point, it is better to use the extra compute to scale throughput, like supporting more concurrent users.
+
+- just like with asr models, the performance gains for real-time tts systems usually come from infrastructure.
+
+- like asr, the biggest speedup comes from streaming over websockets instead of sending a big text and waiting for huge audio chunks.
+
+- important as well, tts models don't do great with long inputs... speech can start to degrade after about 30 seconds.
+
+    ![Realtime TTS](images/tts-realtime.png)
+
+- finally, the books introduce speech-to-speech models a new cool area of research.
+
+- these models, instead of a cascade of models working together, let a single model handle the whole pipeline, basically from audio to audio, without text conversion in the middle, pretty cool! 
+
+- according to the book, at the moment there are not commercially viable open speech-to-speech models.
+
+- and so far, closed options like gpt-realtime are less capable and more expensive than multi-model pipelines.
+    
+    ![Speech-to-Speech Models](images/tts-research.png)
