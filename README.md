@@ -702,3 +702,50 @@
 - and so far, closed options like gpt-realtime are less capable and more expensive than multi-model pipelines.
     
     ![Speech-to-Speech Models](images/tts-research.png)
+
+### Day 17
+
+- today we continue with chapter 6 of inference engineering. section 6.5: image generation models.
+
+- an image generation model can accept either text or a reference image to produce a new image.
+
+- image generation models are usually iterative denoisers, not autoregressive token generators (like llms).
+
+- image models tend to be much smaller than frontier llms, inference for those models is typically constrained by compute, not by bandwidth. 
+
+- the reason is because image models kind of "reuse" the same weights to perform lots of calculations (compute) across image features. 
+
+    ![Image Models vs LLMs](images/image-models-vs-llms.png)
+
+- good to keep in mind, image generation model cards usually show really basic inference examples using the `diffusers` lib.:
+
+    ```python
+    pipe = DiffusionPipeline.from_pretrained("model-name")
+    image = pipe("A cat").images[0]
+    ```
+
+- those examples are focused in simplicity rather than performance, so chances are there is plenty of room for optimization... 
+
+- in case you don't know, a model card is documentation for an ai model. it explains what the model does, how to use it, its limitations, and usually includes a few code examples.
+
+- so... if you're doing high-performance image model inference, use one of these libraries: sglang diffusion, tensorrt or pytorch.
+
+- also, you can further optimize by using more efficient kernels: attention (flash attention 2, 3, 4), norm. functions like rsnorm, gemm, etc.
+
+- the book explains that torch compilation is also really important. 
+
+- it can automatically fuse multiple operations into a single kernel, fusssiiioonnn haaa!
+
+- you can also plug in your own optimized kernels when needed.
+
+    ![Faster Image Model Kernels](images/faster-image-model-kernels.png)
+
+- also you can compile for the exact gpu you're targeting, for example: if you want to run on a b200, compile on b200.
+
+- finally, the book explains image generation step by step. early steps create the basic outline, while later steps fill in the details.
+
+- normally, each step runs the denoising model twice: once with prompt guidance and once without.
+
+- there's a cool trick... you can turn off prompt guidance in later steps, saving a lot of compute without sacrificing much quality.
+
+    ![Faster Image Generation Trick](images/faster-image-gen-trick.png)
