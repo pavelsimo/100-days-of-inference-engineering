@@ -742,10 +742,46 @@
 
 - also you can compile for the exact gpu you're targeting, for example: if you want to run on a b200, compile on b200.
 
-- finally, the book explains image generation step by step. early steps create the basic outline, while later steps fill in the details.
+- finally, the book explains image generation is a step by step process. early steps create the basic outline, while later steps fill in the details.
 
 - normally, each step runs the denoising model twice: once with prompt guidance and once without.
 
 - there's a cool trick... you can turn off prompt guidance in later steps, saving a lot of compute without sacrificing much quality.
 
     ![Faster Image Generation Trick](images/faster-image-gen-trick.png)
+
+### Day 18
+
+- today we continue with chapter 6 of inference engineering. section 6.6: video generation models.
+
+- for all modalities we have seen so far, video generation is the most demanding. 
+
+- the book suggests throwing your best gpus at it... like blackwell or rubin (once they are available).
+
+- more recent gpu architectures can help with memory for context parallelism, faster attention and better quantization formats.
+
+- probably not a surprise, but video generation is a lot like image generation, except it renders a whole video in latent space.
+
+- just to put things in perspective, there are two common approaches when it comes to video generation: each frame generated separately (a.k.a. framewise, the old way), or all frames generated together (the current modern approach, the latent way...).
+
+- on day 4 of this series, we saw that latent space, as a reminder, is just a compressed representation of data... in this case, video data.
+
+- one thing to keep in mind: for video generation, batching doesn't help much... the models are too compute hungry!
+
+- so what usually works best is running one video at a time on a full node of eight gpus going brrrr...
+
+- so if you want to generate more videos (better throughput) for less money, you need to make the video model itself faster.
+
+    ![Video Models](images/video-models.png)
+
+- the book explains that attention is about 70 to 80 percent of the compute for video models. as you can imagine, it's important to optimize...
+
+- some of the optimizations highlighted by the book were: "better" kernel selection (flash attention, deepgemm, cute, etc), timestep caching, transformer caching, attention quantization (fp8), blockwise quantization (mxfp8), selective step quantization, selective layer quantization, and sageattention.
+
+    ![Faster Video Attention](images/faster-video-attention.png)
+
+- finally, video models usually use context parallelism instead of tensor parallelism.
+
+- with context parallelism, each gpu gets a copy of the model weights... this can be done in b200. the gpus then split the attention work using something like ring attention...
+
+    ![Context Parallelism](images/context-parallelism-for-video.png)
