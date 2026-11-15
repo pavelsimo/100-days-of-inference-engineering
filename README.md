@@ -756,25 +756,29 @@
 
 - for all modalities we have seen so far, video generation is the most demanding. 
 
-- the book suggests throwing your best gpus at it... like blackwell or rubin (once they are available).
+- the book suggests throwing your best gpus at it... like blackwell or rubin.
 
 - more recent gpu architectures can help with memory for context parallelism, faster attention and better quantization formats.
 
-- probably not a surprise, but video generation is a lot like image generation, except it renders a whole video in latent space.
-
 - just to put things in perspective, there are two common approaches when it comes to video generation: each frame generated separately (a.k.a. framewise, the old way), or all frames generated together (the current modern approach, the latent way...).
+
+- why is like that? early on, video models basically generated each frame on its own... so things could shift from one frame to the next. 
+
+- these days, modern diffusion models usually denoise the whole video together in latent space, keeping track of what's in each frame and how it changes over time.
+
+- probably not a surprise, but video generation is a lot like image generation, except it renders a whole video in latent space.
 
 - on day 4 of this series, we saw that latent space, as a reminder, is just a compressed representation of data... in this case, video data.
 
 - one thing to keep in mind: for video generation, batching doesn't help much... the models are too compute hungry!
 
-- so what usually works best is running one video at a time on a full node of eight gpus going brrrr...
+- so a common setup that usually works well is running one video at a time on a full node of eight gpus, going brrrr...
 
 - so if you want to generate more videos (better throughput) for less money, you need to make the video model itself faster.
 
     ![Video Models](images/video-models.png)
 
-- the book explains that attention is about 70 to 80 percent of the compute for video models. as you can imagine, it's important to optimize...
+- the book explains that attention is about 70% to 80% of the compute for video models. as you can imagine, it's important to optimize...
 
 - some of the optimizations highlighted by the book were: "better" kernel selection (flash attention, deepgemm, cute, etc), timestep caching, transformer caching, attention quantization (fp8), blockwise quantization (mxfp8), selective step quantization, selective layer quantization, and sageattention.
 
