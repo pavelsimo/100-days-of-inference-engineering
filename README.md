@@ -789,3 +789,37 @@
 - with context parallelism, each gpu gets a copy of the model weights... this can be done in b200. the gpus then split the attention work using something like ring attention...
 
     ![Context Parallelism](images/context-parallelism-for-video.png)
+
+### Day 19
+
+- today we're starting chapter 7 of inference engineering, the final chapter of the book. this one focuses on running inference in production. as usual, we'll work through one section per day, so let's begin with section 7.1: containerization.
+
+- containers turn a program into a packaged artifact that can run "anywhere".
+
+    ![Containers](images/containers.png)
+
+- this helps with the typical excuse, it works on my machine...
+
+- containers tend to be lightweight because they share the host operating system kernel. here "kernel" means linux kernel, not cuda kernel. 
+
+- containers are also different from virtual machines, which usually ship with a full-fledged operating system.
+
+- as the book puts it, containerization these days is basically synonymous with docker. the blue whale... not to be confused with deepseek, which is another blue whale...
+
+- docker hub is a popular image registry for ai, kind of like hugging face for weights or pypi for python packages.
+
+- inference software in general comes with a lot of dependencies... and getting them all to work together can be a pain. once you have a working setup, containers help you keep it that way.
+
+    ![Dependecies](images/containers-deps.png)
+
+- that means pinning versions for cuda, cudnn, drivers, python packages, the inference engine, and system packages. all that while trying to keep the container image small...
+
+- finally, for deployment "convinience" there is nvidia inference microservices (nims). which are pre-built optimized docker containers for popular open models.
+
+- nims come in two types: multi-llm and llm-specific.
+
+- with a multi-llm nim, you can run different models from the same family on supported gpus.
+
+- an llm-specific nim is tuned for a particular combination of model, gpu, and performance settings.
+
+    ![NVIDIA NIMs](images/containers-nims.png)
