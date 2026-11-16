@@ -798,7 +798,7 @@
 
     ![Containers](images/containers.png)
 
-- this helps with the typical excuse, it works on my machine...
+- this helps with the typical excuse: "it works on my machine".
 
 - containers tend to be lightweight because they share the host operating system kernel. here "kernel" means linux kernel, not cuda kernel. 
 
@@ -810,11 +810,11 @@
 
 - inference software in general comes with a lot of dependencies... and getting them all to work together can be a pain. once you have a working setup, containers help you keep it that way.
 
-    ![Dependecies](images/containers-deps.png)
+    ![Dependencies](images/containers-deps.png)
 
 - that means pinning versions for cuda, cudnn, drivers, python packages, the inference engine, and system packages. all that while trying to keep the container image small...
 
-- finally, for deployment "convinience" there is nvidia inference microservices (nims). which are pre-built optimized docker containers for popular open models.
+- finally, for deployment "convenience" there are nvidia inference microservices (nims), which are pre-built optimized docker containers for popular open models.
 
 - nims come in two types: multi-llm and llm-specific.
 
