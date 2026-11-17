@@ -823,3 +823,53 @@
 - an llm-specific nim is tuned for a particular combination of model, gpu, and performance settings.
 
     ![NVIDIA NIMs](images/containers-nims.png)
+
+### Day 20
+
+- today we continue with chapter 7 of inference engineering: section 7.2, autoscaling. this is a really long section, so i'll split it into two parts to make sure we cover the content properly, here is part 1:
+
+- as the book puts it, the goal of autoscaling is to make sure you always have enough resources to serve incoming requests, keep latency within your service level agreements (slas) and not waste money on idle gpus.
+
+- simple enough, right? not really...
+
+- since this is a hard task, kubernetes to the rescue... it acts like a manager for your model containers, making sure replicas are created and run on machines with the right resources, for example gpus.
+
+- kubernetes splits the work into two components: the control plane and the worker plane. the control plane handles routing and scaling decisions. the worker plane runs the containers.
+
+- so to be a bit concrete autoscaling is dynamically adjusting how many replicas of a model are running at a given time, the idea is that capacity should match real demand.
+
+- when deciding when to autoscale, there are two main indicators to watch: utilization and traffic.
+
+    ![Autoscaling](images/autoscaling.png)
+
+- utilization looks at gpu memory or compute usage to decide when to scale. the problem is that this can be a lagging indicator. gpu compute usage may only rise once requests start running, and by then more requests may already be waiting in the queue.
+
+- traffic watches how many requests are coming in. it can pick up a spike in demand and start scaling before that spike shows up in gpu usage.
+
+- utilization and traffic can disagree, for example, a few requests with very long contexts can push gpu utilization to 95%, even when traffic is really low... that's why it's best to monitor both together.
+
+- there are many knobs to tune for autoscaling, some key ones are: min replicas, max replicas, autoscaling window, scale down delay, and concurrency target.
+
+- most of these are self-explanatory, but the autoscaling window needs a bit more explanation. it's how far back you look at recent traffic to decide whether to scale up or down.
+
+- to scale based on traffic, you need to know how many requests each instance can handle at once.  
+
+- most model inference services use batching to process multiple requests together. 
+
+- there are several approaches for batching: static, dynamic, and continuous batching.
+
+- static batching waits until the batch is full to start. 
+
+- dynamic batching starts when the batch fills up or a timeout is reached, whichever comes first. 
+
+- continuous batching adds new requests as others finish and free up space.
+
+- when it comes to batching, there's a tradeoff between latency and throughput: bigger batches tend to increase throughput, but usually at the cost of higher per-request latency. no free lunch!
+
+    ![Batching](images/batching.png)
+
+- finally, cold start is the time it takes to spin up a new replica of a model. 
+
+- ultimately, cold start speed boils down to the following questions... how fast can you get gpus into the cluster?. how fast can you load the container image? how fast can you load the model weights? and how fast can you start your inference engine, including any compilation.
+
+    ![Cold Start](images/cold-starts.png)
