@@ -826,7 +826,9 @@
 
 ### Day 20
 
-- today we continue with chapter 7 of inference engineering: section 7.2, autoscaling. this is a really long section, so i'll split it into two parts to make sure we cover the content properly, here is part 1:
+- today we continue with chapter 7 of inference engineering: section 7.2, autoscaling. 
+
+this is a really long section, so i'll split it into two parts to make sure we cover the content properly, here is part 1:
 
 - as the book puts it, the goal of autoscaling is to make sure you always have enough resources to serve incoming requests, keep latency within your service level agreements (slas) and not waste money on idle gpus.
 
