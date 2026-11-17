@@ -834,7 +834,7 @@ this is a really long section, so i'll split it into two parts to make sure we c
 
 - simple enough, right? not really...
 
-- since this is a hard task, kubernetes to the rescue... it acts like a manager for your model containers, making sure replicas are created and run on machines with the right resources, for example gpus.
+- since this is a hard task, kubernetes to the rescue... it acts like a manager for your model containers, making sure replicas are created and run on machines with the right resources (gpu, memory, etc).
 
 - kubernetes splits the work into two components: the control plane and the worker plane. the control plane handles routing and scaling decisions. the worker plane runs the containers.
 
