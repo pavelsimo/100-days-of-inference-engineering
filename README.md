@@ -875,3 +875,48 @@
 - ultimately, cold start speed boils down to the following questions... how fast can you get gpus into the cluster?. how fast can you load the container image? how fast can you load the model weights? and how fast can you start your inference engine, including any compilation.
 
     ![Cold Start](images/cold-starts.png)
+
+
+### Day 21
+
+- today we continue with chapter 7 of inference engineering: section 7.2, autoscaling, part 2:
+
+- once you have multiple replicas running in kubernetes, the system has to decide which one gets each request.
+
+- there are usually two ways of doing this: you can either use a load balancer or a router.
+
+- but what is the difference? they are both sending the requests to a replica, right?
+
+- the difference is actually in how the decision is made. load balancers tend to be a bit dumber... they distribute incoming traffic based on strategies like round robin, least connections, etc.
+
+- a router makes request-aware decisions to select the best replica, so a router could consider kv-cache locality or current gpu load. so it answers the question "which replica is best for this request?" the load balancer, on the other hand, answers the question "how should we distribute this request across the available replicas?"
+
+- the book also explains different types of routing such as: kv-cache aware routing and lora-aware routing. 
+
+- kv cache-aware routing can send a request to a replica that already has a matching prefix.
+
+- lora-aware routing can send it to a replica that already has the right lora fine-tuned weights.
+
+- by now it should be clear that any good router needs to use information about the request and the infrastructure state to decide on the best path for the request, for example: sequence length, prefix, lora needs, etc...
+
+    ![Routing Requests](images/routing-request-to-replicas.png)
+
+- when traffic spikes... the system also needs to "hold" requests while resources catch up. otherwise, requests will be dropped, which is probably not a good thing... :)
+
+- a queue helps handle this sort of issue. basic queues are first-in, first-out, but if you have more complex needs, you can use a priority queue. for example, during heavy traffic, you could give enterprise users priority over consumer users.
+
+- advanced autoscaling systems can "scale to zero", meaning no replicas stay active when there's no traffic... when requests come in again, the system automatically scales back up.
+
+- for scale to zero to work, the system needs fast cold starts and reliable queueing. this makes sense, you want the system to come online as fast as possible without losing requests...
+
+- scale to zero is great for development, where you can afford some extra latency on the first request. it also works well for periodic agentic workloads that only run during certain business hours.
+
+- finally, many ai applications these days need to use multi-model and multi-stage pipelines.
+
+- because of that, different stages can have different hardware and scaling needs.
+
+- for example, a voice activity detector (vad) can run on a smaller gpu than a transcription model or an llm.
+
+- so as an inference engineer, it's your job to figure out which parts need to scale independently. that way, each part gets the right type and amount of resources.
+
+    ![Component Scaling](images/component-scaling.png)
