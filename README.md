@@ -933,7 +933,7 @@
 
     ![Multi-Cloud Inference](images/multi-cloud-inference.png)
 
-- getting access to gpus (procurement) is not a trivial task these days... hyperscalers (aws, gcp), neoclouds (coreweave, nebius), and resellers (sf compute) each have their own nuances.
+- getting access to gpus (procurement) is not a trivial task these days... hyperscalers (aws, gcp), neoclouds (coreweave, nebius), and resellers (sf compute company) each have their own nuances.
 
 - securing gpu capacity for newer hardware is especially hard... providers often reserve gpus for their biggest customers on long-term contracts.
 
