@@ -920,3 +920,54 @@
 - so as an inference engineer, it's your job to figure out which parts need to scale independently. that way, each part gets the right type and amount of resources.
 
     ![Component Scaling](images/component-scaling.png)
+
+### Day 22
+
+- today we continue with chapter 7 of inference engineering: section 7.3, multi-cloud capacity management.
+
+- yesterday, we saw how autoscaling helps inside a cluster of gpus.
+
+- now things get even more "fun" when we are dealing with global workloads. this means gpus spread all around the world!
+
+- why bother? one cluster is complicated enough, right? well, there are several benefits: more capacity, better redundancy, lower latency (servers close to users), and easier compliance (regulatory requirements, etc.).
+
+    ![Multi-Cloud Inference](images/multi-cloud-inference.png)
+
+- getting access to gpus (procurement) is not a trivial task these days... hyperscalers (aws, gcp), neoclouds (coreweave, nebius), and resellers (sf compute) each have their own nuances.
+
+- securing gpu capacity for newer hardware is especially hard... providers often reserve gpus for their biggest customers on long-term contracts.
+
+- when buying gpus you have usually three options: reserved, on-demand, and spot instances.
+
+- reserved means booking hundreds or thousands of gpus for months or years at a discount...
+
+- on-demand lets you rent individual instances as needed, within your quota, at a higher hourly rate. 
+
+- spot is cheaper, but the provider can take instances back with just minutes of notice.
+
+- for large inference workloads, the common approach is to rely on cheaper reserved gpus and add on-demand or spot instances when traffic spikes...
+
+- if you're running a worldwide app, chances are you're going to need a global load balancer.
+
+- one thing to avoid is sending traffic across time zones, for example, sending singapore traffic to san francisco...
+
+- as a rule of thumb, crossing a time zone adds about five milliseconds of latency, so keep those workloads near your users...
+
+    ![Getting GPUs](images/getting-gpus.png)
+
+- some bad news... according to the book, gpus fail more often than you would expect :(
+
+- in the llama 3 paper, researchers ran 16,000 gpus for 54 days and saw 419 unexpected interruptions... about one failure per 50,000 gpu-hours.
+
+- it does not sound so bad, right? well... one 8-gpu node running for a year is over 70,000 gpu-hours, so it will happen. expect it to be on a friday :)
+
+- finally, it is extremely important that inference is secure and compliant, this includes: user data, model weights and infrastructure. 
+
+- if you don't need to store user inputs or model outputs, not storing them is one of the easiest ways to reduce risk, remember no one can't stole the data you don't have ;)
+
+- multi-cloud deployments often help with compliance as a side effect of picking the "right" provider. those providers must have certifications such as soc 2 type ii or hipaa.
+
+- in addition to that, multi-cloud deployments need to satisfy data residency rules in some cases, like keeping canadian data in canada and american data in the united states.
+
+
+    ![World Wide Inference](images/worldwide-inference.png)
