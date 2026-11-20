@@ -971,3 +971,51 @@
 
 
     ![World Wide Inference](images/worldwide-inference.png)
+
+### Day 23
+
+- today we continue with chapter 7 of inference engineering: section 7.4, testing and deployment.
+
+- before going "live", it really makes sense to test your inference engine end-to-end. this is not just about getting a checkmark that says "pass", it's about making sure the whole system actually works.
+
+- there are several testing strategies for inference: manual testing, load testing and shadow traffic. 
+
+- manual testing is basically hacking a script to generate synthetic traffic for the inference service.
+
+- load testing as the name suggests, sends a lot of traffic to see if the system can handle it... while staying somehow "functional".
+
+- shadow traffic is just cloning live traffic... the idea here is to mimic real conditions as closely as possible.
+
+    ![Testing](images/testing-before-you-deploy.png)
+
+- when it is time to deploy, high-availability deployments are really important for avoiding downtime.
+
+- the book explains two common ways to do this: blue-green deployment and canary deployment.
+
+- with blue-green deployment, you spin up a full copy running the new version, then switch all traffic over at once. the old version stays ready in case something goes wrong and you need to roll back...
+
+- canary deployment starts small... send a few users to the new version and see how it behaves. if everything looks good, gradually send more traffic its way...
+
+    ![Zero-Downtime Deployment](images/zero-downtime-deployment.png)
+
+- once you move from a public api to running inference on your own gpus, figuring out costs gets a bit trickier... you can't just count tokens and multiply by a price anymore :(
+
+- with dedicated inference, you have more control over what each request costs, but there's more to keep track of... for example: batch sizing, traffic patterns, and input/output sequence lengths, etc...
+
+- with a public api, the math is pretty simple:
+
+    ```text
+    price per million tokens x usage in millions of tokens.
+    ```
+
+- for example, $2 per million tokens × 3 million tokens used = $6... then account for things like cache hits or volume discounts, then you have it!
+
+    ![Estimating Cost](images/estimating-cost.png)
+
+- finally, since inference services for the most part are "mission-critical" you need to keep an eye on how they're running!
+
+- what does that mean? monitoring...
+
+- ok... what to monitor? as much as you can: total request volume, request, response size, response codes, latency (p50, p90, p99), replica count, utilization, queue depth, etc...
+
+    ![Observability](images/observability.png)
