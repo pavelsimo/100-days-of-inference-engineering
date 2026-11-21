@@ -1019,3 +1019,47 @@
 - ok... what to monitor? as much as you can: total request volume, request, response size, response codes, latency (p50, p90, p99), replica count, utilization, queue depth, etc...
 
     ![Observability](images/observability.png)
+
+### Day 24
+
+- today i finished chapter 7 of inference engineering: section 7.5, client code, the last chapter of the book.... 
+
+- great learnings so far! tomorrow we continue with the next "quest", stay around! :)
+
+- a lot of "tech" is going into making inference engineering work... cuda, kubernetes, vLLM, etc. but one thing is often overlooked is client code.
+
+- what do we mean by "client code"? well, for inference to happen, your computer has to be able to reach the server where the model is hosted, so a request has to go from your machine to that server.
+
+- there's nothing magical about this. it's a typical client-server model: your machine is the client, and the inference service is the server.
+
+    ![Client Code](images/client-code.png)
+
+- the openai sdk is a popular choice for sending requests to a inference service. you can also use libraries like langchain, vercel ai sdk, litellm or llamaindex.
+
+- the book explains that setting up an https connection requires a tls handshake, which adds significant latency... the way to go here is to reuse the session and avoid repeating the tls handshake for each request. 
+
+- the openai sdk handles this under the hood, but if you're building your own custom http client make sure you're not doing repeated tls handshakes...
+
+    ![Client Latency Overhead](images/client-latency-overhead.png)
+
+- keep in mind, "http" is not always the way to go... for real-time apps you might want to keep a connection open so the client and server can keep exchanging messages... websockets are nice option for this.
+
+- if you're processing lots of documents and don't need results right away, async jobs make a lot of sense... this usually means your workload is optimize for throughput, whenever you identify this pattern think async...
+
+- an async request is a "fire and forget" kind of thing... the way this is usually implemented is a follow: the client sends a request, the server acknowledges the job, then sends the results back via a webhook when they're ready.
+
+    ![Async Inference](images/async-inference.png)
+
+- finally, streaming is a nice way to make your app feel "responsive"...
+
+- for text output, http usually works pretty well... unless you have really "special" requirements.
+
+- for other modalities like video and audio, it's better to reach for something more "fancy" like websockets or grpc :)
+
+- websockets and grpc create a bidirectional connection between the client and server, where both sides can send messages as long as the connection stays open.
+
+- pick websockets when you're sending unstructured and real-time data, like audio.
+
+- pick grpc when you’re dealing with structured data: requests sent via grpc must follow a predefined schema. that schema thing is not "free", it involves parsing... so it adds some overhead to the comunication. 
+
+    ![Streaming Protocols](images/streaming-protocols.png)
