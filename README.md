@@ -1063,3 +1063,54 @@
 - pick grpc when you’re dealing with structured data: requests sent via grpc must follow a predefined schema. that schema thing is not "free", it involves parsing... so it adds some overhead to the comunication. 
 
     ![Streaming Protocols](images/streaming-protocols.png)
+
+
+### Day 25
+
+- yesterday we finished the book inference engineering by philip kiely. this was an amazing introduction to this new field... i still have a lot to explore, but now i have a much better idea of where i'm going.
+
+- just to put it in perspective, reading that book in a way felt a bit like finding the map in a zelda dungeon... so you enter the "spirit template" completely clueless of what is going on in there. you open that chest which contains the dungeon map... suddenly you can see how the rooms connect and where to head next. you still have to beat the final boss, but at least you have a way forward!
+
+- so... what's next? i would like something more hands-on. i recently bought a book by elliot arledge: [cuda for llms](https://www.manning.com/books/cuda-for-llms).
+
+- the book content matches really well with my initial plan of going to the cuda side of inference engineering, so for the next few days i will cover this book.
+
+- we're starting with chapter 1 of cuda for llms. the chapter title is: "when pytorch just isn't enough"
+
+- this is a bit long to cover in one post, so expect two or more...
+
+- using the gpu hardware effectively is critical for both training and inference, especially when doing llm inference.
+
+- writing cuda is in a way the most direct way to control what the gpu is executing. 
+
+- pytorch uses cuda under the hood to run (and other backends). if you've used pytorch before, the following line probably looks familiar:
+
+    ```text
+        model = model.to("cuda")
+    ```
+
+- this is telling the program to transfer the model and its parameters to the gpu memory.
+
+- so if cuda is so cool... why aren't we all writing it? when exactly do we need those custom kernels?
+
+- the book explains that there are several "scenarios" where it makes sense to write cuda from scratch, for others you are probably better off picking something like cubBLAS, cuDNN, etc. for example:
+
+- a framework contributor implementing a kernel for a new architecture.
+
+- a kernel engineer at a large ai lab (xai, anthropic, etc) optimizing inference throughput.
+
+- an edge deployment engineer for a low latency robotics use case.
+
+- an algorithms researcher developing new performance optimizations, like flash attention.
+
+    ![When you do need custom CUDA?](images/when-do-you-need-custom-cuda.png)
+
+- finally, pytorch ships with a bunch of prewritten gpu kernels, sometimes those kernels are not as "optimal" as they could be, there are several reasons for that.
+
+- the first is that the default kernels play it safe, they need to ensure the kernel works for all users, even if that makes them a bit slower.
+
+- also, new gpus add features that libraries take a while to support... so a custom kernel can use them and beat the default.
+
+- pytorch is still the right tool for most use cases. it just helps to know when its prewritten kernels are not fast enough and writing your own might be better...
+
+    ![Why write your own kernels](images/why-write-your-own-kernels.png)
