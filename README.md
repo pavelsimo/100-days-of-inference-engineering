@@ -1119,8 +1119,6 @@
 
 - today we continue with chapter 1 of cuda for llms: "when pytorch just isn't enough".
 
-- we saw some of this content in my cuda series, but let's take a step back and relearn some of this through different lenses. i once heard that an expert is someone who understands the basics extremely well!
-
 - in cuda programs you're always working in two different contexts: the host, your cpu and the device, the gpu.
 
 - the cpu manages the ram, and the gpu manages vram. vram stands for video ram, and it's an historical thing. remember, gpus were not initially created for ai, but for 3d graphics.
