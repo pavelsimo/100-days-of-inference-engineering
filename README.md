@@ -1114,3 +1114,33 @@
 - pytorch is still the right tool for most use cases. it just helps to know when its prewritten kernels are not fast enough and writing your own might be better...
 
     ![Why write your own kernels](images/why-write-your-own-kernels.png)
+
+### Day 26
+
+- today we continue with chapter 1 of cuda for llms: "when pytorch just isn't enough".
+
+- we saw some of this content in my cuda series, but let's take a step back and relearn some of this through different lenses. i once heard that an expert is someone who understands the basics extremely well!
+
+- in cuda programs you're always working in two different contexts: the host, your cpu and the device, the gpu.
+
+- the cpu manages the ram, and the gpu manages vram. vram stands for video ram, and it's an historical thing. remember, gpus were not initially created for ai, but for 3d graphics.
+
+- cpu and gpu architecture are quite different, cpu has a few complex cores with big caches, gpu has "many" small cores running the same instruction on different data at once. also, gpus put way more into the arithmetic logic units (the cores) and way less into cache and control flow.
+
+    ![CPU vs GPU](images/cpu-vs-gpu.png)
+
+- what is a kernel? as the book explains, this is a really crowded term: popcorn kernel, linux kernel, military colonel, or convolution kernel? none of those :)
+
+- in really simple terms, a kernel is a function that runs on the gpu. each thread in a kernel gets a piece of the "action", in other words, a small piece of the data. from the developer's perspective, you write your kernel as if you're working with a single thread.
+
+- a typical cuda program looks something like this: allocate gpu memory, copy input data to the gpu (device), run your kernel(s) on the gpu, and copy the results back to the cpu (host).
+
+    ![CUDA kernels](images/cuda-kernels.png)
+
+- finally, as the book put it, every time you see the same operation applied to a bunch of different data, your spider sense should activate: "parallelize opportunity".
+
+- computer scientist, yep you and i... call this pattern simd. it sounds a bit like "cindy". this means single instruction, multiple data. if you want to learn more check out the flynn's taxonomy.
+
+- here is the thing gpus, do not use exactly "simd" but a close cousin :) "simt"... the book explains this distinction is super important, in "vanilla simd" every lane executes the same instruction in a lockstep and is not possible to diverge. for simt individual threads can branch indepedently.
+
+    ![SIMD vs SIMT](images/simd-vs-simt.png)
