@@ -1139,6 +1139,6 @@
 
 - computer scientist, yep you and i... call this pattern simd. it sounds a bit like "cindy". this means single instruction, multiple data. if you want to learn more check out the flynn's taxonomy.
 
-- here is the thing gpus, do not use exactly "simd" but a close cousin :) "simt"... the book explains this distinction is super important, in "vanilla simd" every lane executes the same instruction in a lockstep and is not possible to diverge. for simt individual threads can branch indepedently.
+- here is the thing: gpus do not use exactly "simd", but a close cousin :) "simt"... the book explains that this distinction is super important. in "vanilla simd", every lane executes the same instruction in lockstep, and it is not possible to diverge. for simt, individual threads can branch independently.
 
     ![SIMD vs SIMT](images/simd-vs-simt.png)
