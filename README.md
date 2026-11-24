@@ -1179,6 +1179,6 @@
 
 - finally, the book explains deep learning is pretty much a lot of matrix operations, which is exactly the environment where a gpu shines!
 
-- some of the most common ones are: matrix multiplication, element-wise operations (relu, gelu, and so on...), convolutions, gradient computations, attention mechanisms, etc.
+- some of the most common operations are: matrix multiplication (gemm), element-wise operations (relu, gelu, and so on...), convolutions, gradient computations, attention mechanisms, etc.
 
     ![The Math inside Deep Learning](images/the-math-inside-deep-learning.png)
