@@ -1139,6 +1139,46 @@
 
 - computer scientist, yep you and i... call this pattern simd. it sounds a bit like "cindy". this means single instruction, multiple data. if you want to learn more check out the flynn's taxonomy.
 
-- here is the thing: gpus do not use exactly "simd", but a close cousin :) "simt"... the book explains that this distinction is super important. in "vanilla simd", every lane executes the same instruction in lockstep, and it is not possible to diverge. for simt, individual threads can branch independently.
+- here is the thing... gpus do not use exactly "simd", but a close cousin :) "simt"... the book explains that this distinction is super important. in "vanilla simd", every lane executes the same instruction in a lockstep, and it is not possible to diverge. for simt, individual threads can branch independently.
 
     ![SIMD vs SIMT](images/simd-vs-simt.png)
+
+### Day 27
+
+- today i finished chapter 1 of cuda for llms: "when pytorch just isn't enough".
+
+- modern gpus have a complex memory hierarchy. you might have seen the memory hierarchy pyramid, with the top being the registers (fastest) and the bottom being cpu ram (slowest). 
+
+- in principle it's really simple... the closer you are to the chip, the faster you go. is a speed of light thing, you can't mess up with physics! 
+
+- for a h100 these are the latency numbers in cycles: register ~1 cyle, shared memory / l1 ~30-40 cycles, l2 cache ~250 cycles, vram ~500 cyles. 
+
+- put it this way... if reading a register takes around 1 sec, you would wait over 8 minutes for fetching something in vram!
+
+- so should be clear by now, if you want to run fast you need to stay in the fastest possible memory tier for as long as possible.
+
+    ![GPU Memory Hierarchy](images/gpu-memory-hierarchy.png)
+
+- so for example: if you're doing a matrix multiplication, or "matmul" with a little extra love... a naive implementation reads the matrix entries from global memory, while an optimized one uses shared memory instead.
+
+- the book explains how optimizations form a "ladder" that builds on itself as you move along the levels, and how most developers probably won't go beyond pytorch built-in functions.
+
+    ![The Optimization Ladder](images/optimization-ladder.png)
+
+- we can all agree gpus are awesome, but we have to be careful in not becoming the man with a hammer, that thinks everything is a nail... gpu are not suitable for all tasks, in fact there are some tasks when you're better off staying in cpu. 
+
+- the book gave a few examples where the gpu is not so "great": 
+
+- tiny dataset problems, where moving data from cpu to gpu tends to dominate the runtime. 
+
+- low arithmetic intensity, where you're limited by memory bandwidth.
+
+- irregular workloads, a lot operations with unpredictable branching. parallelism just breaks apart.
+
+    ![When a GPU does not help](images/when-a-gpu-doesnt-help.png)
+
+- finally, the book explains deep learning is pretty much a lot of matrix operations, which is exactly the environment where a gpu shines!
+
+- some of the most common ones are: matrix multiplication, element-wise operations (relu, gelu, and so on...), convolutions, gradient computations, attention mechanisms, etc.
+
+    ![The Math inside Deep Learning](images/the-math-inside-deep-learning.png)
