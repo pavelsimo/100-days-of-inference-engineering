@@ -1196,21 +1196,21 @@
 
 - you can think of a cpu as a formula 1 car. it takes you from point a to point b really fast. cpus are optimized for latency.
 
-- a gpu in the otherhand is like a cargo ship, it takes more time to start, but once you load the containers you can take a lot of "stuff", gpus are optimized for througput. 
+- a gpu on the other hand is like a cargo ship, it takes more time to start, but once you load the containers you can take a lot of "stuff", gpus are optimized for throughput. 
 
-    ![Latency vs Througpht](images/latency-vs-throughput.png)
+    ![Latency vs Throughput](images/latency-vs-throughput.png)
 
 - the book explains that when it comes to deep learning, throughput is all that matters... we don't care about doing one single multiplication really fast. we care about doing billions of them!
 
 - the chapter explains a simple example of vector addition (vecadd). this is like the "hello world" of cuda... 
 
-- that example in particular is not super important, but what is useful is to understand is the basic anatomy of a cuda program. see image below.
+- that example in particular is not super important, but what is useful is understanding the basic anatomy of a cuda program. see the image below.
 
     ![Anatomy of a CUDA program](images/anatomy-cuda-program.png)
 
 - finally, sometimes it helps to see the cpu and gpu versions of a program side by side to understand the differences...
 
-- if we compare the cpu and gpu vecadd, we can see that the outer loop in the cpu code is replaced by an expression that looks like this for the gpu code:
+- if we compare the cpu and gpu versions of vecadd, we can see that the outer loop in the cpu code is replaced by an expression that looks like this for the gpu code:
 
     ```
     int i = blockIdx.x * blockDim.x + threadIdx.x;
