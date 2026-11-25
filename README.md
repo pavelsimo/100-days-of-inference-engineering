@@ -1182,3 +1182,52 @@
 - some of the most common operations are: matrix multiplication (gemm), element-wise operations (relu, gelu, and so on...), convolutions, gradient computations, attention mechanisms, etc.
 
     ![The Math inside Deep Learning](images/the-math-inside-deep-learning.png)
+
+
+### Day 28
+
+- today i started chapter 2 of cuda for llms: "your first cuda program".
+
+- if you followed my 100-day cuda series, we have covered similar content already. still... it's good to revisit the basics through different lenses.
+
+- remember "true experts continually deepen their mastery of the basics" -- edward b. burger, the 5 elements of effective thinking
+
+- it's important to have a clear understanding of what a gpu and a cpu are good for. 
+
+- you can think of a cpu as a formula 1 car. it takes you from point a to point b really fast. cpus are optimized for latency.
+
+- a gpu in the otherhand is like a cargo ship, it takes more time to start, but once you load the containers you can take a lot of "stuff", gpus are optimized for througput. 
+
+    ![Latency vs Througpht](images/latency-vs-throughput.png)
+
+- the book explains that when it comes to deep learning, throughput is all that matters... we don't care about doing one single multiplication really fast. we care about doing billions of them!
+
+- the chapter explains a simple example of vector addition (vecadd). this is like the "hello world" of cuda... 
+
+- that example in particular is not super important, but what is useful is to understand is the basic anatomy of a cuda program. see image below.
+
+    ![Anatomy of a CUDA program](images/anatomy-cuda-program.png)
+
+- finally, sometimes it helps to see the cpu and gpu versions of a program side by side to understand the differences...
+
+- if we compare the cpu and gpu vecadd, we can see that the outer loop in the cpu code is replaced by an expression that looks like this for the gpu code:
+
+    ```
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    ```
+
+- if you are learning cuda, that is probably one of the most important lines ever, and it appears everywhere... 
+
+- as we mentioned before, when you launch a gpu kernel, you launch a bunch of threads running the same code... 
+
+- each thread gets the same kernel code, but the indices it receives are different...
+
+- you can use those indices to decide which part of the array to work on... clever, right?
+
+- for vecadd, the trick is to launch enough threads to cover the complete array. each thread adds one pair of elements and writes the result at its own index, which is why the lengths of arrays a, b, and c (the result) are exactly the same.
+
+- so... on the cpu, the loop processes the array one pair at a time (assuming a single thread, the default for lazy developers, including myself here...).
+
+- that's the idea... with the gpu, each thread takes a small piece of the work... with the cpu a single thread works a ton!
+
+    ![Vector Addition CPU vs GPU](images/vecadd-cpu-vs-gpu.png)
