@@ -1231,3 +1231,83 @@
 - that's the idea... with the gpu, each thread takes a small piece of the work... with the cpu a single thread works a ton!
 
     ![Vector Addition CPU vs GPU](images/vecadd-cpu-vs-gpu.png)
+
+### Day 29
+
+- today i finished chapter 2 of cuda for llms: "your first cuda program".
+
+- remember this line we saw yesterday?
+
+    ```c
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    ```
+
+- let's explain what this is all about...
+
+- cuda organizes threads into a hierarchy: a "grid" has blocks, "blocks" contain threads, and "threads" are just threads! :)
+
+- the book uses a really excellent analogy for describing the hierarchy: think of it as an apartment complex:
+
+- the "grid" is the entire complex. 
+
+- each block is a single floor (blockIdx.x). 
+
+- and each thread is a single room on that floor (threadIdx.x).
+
+    ![Grid, blocks, threads](images/grids-blocks-threads.png)
+
+- so coming back to the index `i` above, this gives us a 1d global thread index that we can use to uniquely assign a piece of data within our kernels. here, `blockdim.x` is the total number of threads in a block.
+
+- here is the thing... before launching a cuda kernel, we need to decide how many threads and blocks we need. this is a really important decision, and it sometimes takes profiling to get it right. a resonable place to start is here:
+
+    ```c
+    int threadsPerBlock = 256;
+    int blocksPerGrid = (n + threadsPerBlock - 1) / threadsPerBlock;
+    ```
+
+- `blocksPerGrid` rounds up so we have enough threads for all `n` elements. for example, 1,100 elements with 256 threads per block need 5 blocks.
+
+    ```text
+    (1100 + 256 - 1) / 256 = 5 blocks
+    256 * 5 = 1280 threads
+    1280 - 1100 = 180 extra threads
+    ```
+
+- note that we ended up with 180 extra threads. this is why you sometimes see bounds checks in cuda programs, such as if (i < n), to prevent threads from accessing invalid memory (out-of-bounds).
+
+    ![Boundary Check](images/boundary-check-in-2d.png)
+
+- we can also launch kernels with a 2d configuration, as follow:
+
+    ```c
+    dim3 threadsPerBlock(16, 16);
+    dim3 blocksPerGrid(
+        (W + threadsPerBlock.x - 1) / threadsPerBlock.x,
+        (H + threadsPerBlock.y - 1) / threadsPerBlock.y
+    );
+    ```
+
+- and for accessing the indexes:
+
+    ```c
+    int col = blockIdx.x * blockDim.x + threadIdx.x;
+    int row = blockIdx.y * blockDim.y + threadIdx.y;
+    ```
+
+- 3d works the same way... give `dim3` a third value for depth, then calculate the z index with `blockidx.z * blockdim.z + threadidx.z`.
+
+- finally, there are situations when is useful to flatten an array into row-major order, in other words going for 3d to 1d. you can use the following formula to do that:
+
+    ```c
+    int idx = z * (H * W) + y * W + x;
+    ```
+
+- it's usually not a good idea to just memorize a formula, so let's try to understand where this comes from.
+
+- every time you move a step in `z` you moves past a complete matrix, so that's why the step is of size `H * W` elements. 
+
+- in the same manner, every step in `y` moves past one complete row, so that's `W` elements. 
+
+- lastly, you just add `x` the current column. that's where `z * (H * W) + y * W + x` comes from.
+
+    ![3D indexing and flattening](images/3d-indexing-and-flattening.png)
