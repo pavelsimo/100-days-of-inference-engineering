@@ -1311,3 +1311,57 @@
 - lastly, you just add `x` the current column. that's where `z * (H * W) + y * W + x` comes from.
 
     ![3D indexing and flattening](images/3d-indexing-and-flattening.png)
+
+### Day 30
+
+- today i started chapter 3 of cuda for llms: "naive kernels".
+
+- this chapter is an introduction to many fundamental operations in deep learning, the goal of the author is not optimize kernels, is guide us to write simple and correct kernels first.
+
+- the book explains that writing "correct" cuda kernels is not a trivial task... i agree with this statement. remember: "good programming is hard, bad programming is easy," -- mike acton.
+
+- writing programs that makes a gpu go brrr is not easy, which is why is fun :)
+
+- the author suggest that it helps to first write a cpu version that you can use to verify the results of your kernel(s).
+
+- so... first implement on cpu, then implement on gpu, finally verify...
+
+    ![Matrix Add: CPU vs GPU](images/matrix-add-cpu-vs-gpu.png)
+
+- the first of the fundamental operations is matrix transpose.
+
+- a matrix transpose is really just a data reshaping operation, this means the same physical memory can be interpreted with different logical layouts.
+
+- this is super useful because, when multiplying against a matrix transpose, you don't need to actually materialize the transpose, but instead navigate the indexes in a different order. the image below should make this clear.
+
+- if you don't know what i mean by materializing the matrix, it means actually allocating a matrix in vram using cudamalloc. remember what we learned about the memory pyramid? this means going all the way down in the pyramid, which is not cheap...
+
+    ![Matrix Transpose](images/matrix-transpose.png)
+
+- the second fundamental operation is gemm, which stands for general matrix multiply.
+
+- gemm is the main resposible for all the cat generated videos you see on your X feed :)
+
+- joke aside... this operation is at the heart of modern deep learning. from mlps, attention, etc. 
+
+- for gemm, there is a naming convention for the matrices: `K` is the dimension that both matrix `A` and matrix `B` share.
+
+    ```text
+    A -> M x K
+    B -> K x N
+    C -> M x N 
+    ```
+
+- in simple terms gemm, is just take a row from `A` and a column from `B`, compute their dot product, and put the result in the matching cell of `C`. we repeat this for every row and column pair and we're done...
+
+- for the cpu version we need two outer loops for the (row, col) pairs, for the cuda kernel we can do this with our besty the global indices: 
+
+    ```c
+    int col = blockIdx.x * blockDim.x + threadIdx.x;
+    int row = blockIdx.y * blockDim.y + threadIdx.y;
+    ```
+
+- the cool thing about the kernel is that all cells are computed in parallel, see the power? instead of having one cpu thread loop and calculate the dot products for all cells...
+
+
+    ![GEMM: CPU vs GPU](images/gemm-cpu-vs-gpu.png)
